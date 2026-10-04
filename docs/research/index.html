@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+```
+<meta name="description" content="A time-aware opportunity scoring study for prioritizing search content for human review using Logistic Regression and a rule-based baseline.">
+<meta name="author" content="Muhammad Ali">
+
+<title>Prioritizing Search Content for Human Review | Muhammad Ali</title>
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --bg-color: #f8fafc;
+        --card-bg: #ffffff;
+        --text-main: #0f172a;
+        --text-muted: #475569;
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --border: #e2e8f0;
+        --code-bg: #f1f5f9;
+        --success-bg: #f0fdf4;
+        --success-border: #bbf7d0;
+        --warning-bg: #fffbeb;
+        --warning-border: #fde68a;
+        --shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    html {
+        scroll-behavior: smooth;
+        scroll-padding-top: 30px;
+    }
+
+    body {
+        font-family: "Inter", sans-serif;
+        background: var(--bg-color);
+        color: var(--text-main);
+        line-height: 1.7;
+    }
+
+    /* =========================
+       SIDEBAR
+    ========================== */
+
+    aside {
+        width: 280px;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background: var(--card-bg);
+        border-right: 1px solid var(--border);
+        padding: 2.5rem 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        overflow-y: auto;
+        z-index: 100;
+    }
+
+    .author-box {
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .author-box h2 {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin-bottom: 0.25rem;
+    }
+
+    .author-box p {
+        font-size: 0.78rem;
+        color: var(--primary);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+    }
+
+    aside h3 {
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text-muted);
+        margin-bottom: 0.75rem;
+    }
+
+    aside ul {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+    }
+
+    aside a {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 0.88rem;
+        font-weight: 500;
+        padding: 0.5rem 0.75rem;
+        border-radius: 6px;
+        display: block;
+        transition: 0.2s ease;
+    }
+
+    aside a:hover {
+        color: var(--primary);
+        background: var(--code-bg);
+    }
+
+    /* =========================
+       MAIN CONTENT
+    ========================== */
+
+    main {
+        margin-left: 280px;
+        max-width: 1100px;
+        padding: 4rem 4rem 6rem;
+    }
+
+    header {
+        margin-bottom: 2.5rem;
+        padding-bottom: 2rem;
+        border-bottom: 2px solid var(--border);
+    }
+
+    .eyebrow {
+        display: inline-block;
+        margin-bottom: 0.9rem;
+        color: var(--primary);
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+
+    h1 {
+        font-size: clamp(2rem, 4vw, 2.8rem);
+        font-weight: 800;
+        line-height: 1.2;
+        color: var(--text-main);
+        margin-bottom: 1rem;
+        letter-spacing: -0.025em;
+    }
+
+    .subtitle {
+        color: var(--text-muted);
+        font-size: 1.08rem;
+        max-width: 850px;
+        margin-bottom: 1.2rem;
+    }
+
+    .meta-byline {
+        font-size: 0.95rem;
+        color: var(--text-muted);
+    }
+
+    .meta-byline strong {
+        color: var(--text-main);
+    }
+
+    /* =========================
+       ABSTRACT
+    ========================== */
+
+    .abstract-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-left: 4px solid var(--primary);
+        padding: 1.75rem;
+        border-radius: 8px;
+        margin-bottom: 3rem;
+        box-shadow: var(--shadow);
+    }
+
+    .abstract-card h2 {
+        border: none;
+        padding: 0;
+        margin-bottom: 0.7rem;
+        color: var(--primary);
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+    }
+
+    /* =========================
+       SECTIONS
+    ========================== */
+
+    section {
+        margin-bottom: 3.75rem;
+        scroll-margin-top: 2rem;
+    }
+
+    h2 {
+        font-size: 1.55rem;
+        font-weight: 750;
+        margin-bottom: 1.1rem;
+        color: var(--text-main);
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 0.55rem;
+    }
+
+    h3 {
+        font-size: 1.15rem;
+        font-weight: 700;
+        margin: 1.8rem 0 0.8rem;
+        color: var(--text-main);
+    }
+
+    h4 {
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    p {
+        margin-bottom: 1.2rem;
+        color: var(--text-muted);
+        font-size: 1rem;
+    }
+
+    strong {
+        color: var(--text-main);
+    }
+
+    /* =========================
+       LISTS
+    ========================== */
+
+    ul.content-list,
+    ol.content-list {
+        margin: 0 0 1.5rem 1.5rem;
+        color: var(--text-muted);
+    }
+
+    ul.content-list li,
+    ol.content-list li {
+        margin-bottom: 0.6rem;
+        padding-left: 0.25rem;
+    }
+
+    /* =========================
+       TABLES
+    ========================== */
+
+    .table-container {
+        width: 100%;
+        overflow-x: auto;
+        margin: 1.5rem 0 2rem;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--card-bg);
+        box-shadow: var(--shadow);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+        font-size: 0.9rem;
+        min-width: 650px;
+    }
+
+    th {
+        background: var(--code-bg);
+        color: var(--text-main);
+        font-weight: 700;
+        padding: 0.8rem 1rem;
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+    }
+
+    td {
+        padding: 0.8rem 1rem;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-muted);
+    }
+
+    tr:last-child td {
+        border-bottom: none;
+    }
+
+    tr:hover td {
+        background: #f8fafc;
+    }
+
+    /* =========================
+       HIGHLIGHT CARDS
+    ========================== */
+
+    .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin: 1.5rem 0 2rem;
+    }
+
+    .metric-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1.2rem;
+        box-shadow: var(--shadow);
+    }
+
+    .metric-label {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 600;
+        margin-bottom: 0.35rem;
+    }
+
+    .metric-value {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--primary);
+    }
+
+    .info-box {
+        background: var(--code-bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1.25rem 1.5rem;
+        margin: 1.5rem 0;
+    }
+
+    .success-box {
+        background: var(--success-bg);
+        border: 1px solid var(--success-border);
+        border-radius: 8px;
+        padding: 1.25rem 1.5rem;
+        margin: 1.5rem 0;
+    }
+
+    .warning-box {
+        background: var(--warning-bg);
+        border: 1px solid var(--warning-border);
+        border-radius: 8px;
+        padding: 1.25rem 1.5rem;
+        margin: 1.5rem 0;
+    }
+
+    /* =========================
+       CODE
+    ========================== */
+
+    code {
+        font-family: "JetBrains Mono", monospace;
+        background: var(--code-bg);
+        padding: 0.18rem 0.38rem;
+        border-radius: 4px;
+        font-size: 0.87rem;
+        color: #be123c;
+    }
+
+    .code-block {
+        background: #0f172a;
+        color: #e2e8f0;
+        padding: 1rem 1.2rem;
+        border-radius: 8px;
+        overflow-x: auto;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.85rem;
+        margin: 1.2rem 0 1.5rem;
+    }
+
+    /* =========================
+       FIGURES
+    ========================== */
+
+    .image-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        margin: 2rem 0;
+    }
+
+    .img-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1.25rem;
+        text-align: center;
+        box-shadow: var(--shadow);
+    }
+
+    .img-card img {
+        display: block;
+        max-width: 100%;
+        height: auto;
+        margin: 0 auto 0.9rem;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+    }
+
+    .img-card figcaption {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+    }
+
+    /* =========================
+       ARTIFACTS
+    ========================== */
+
+    .artifact-box {
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .artifact-box h4 {
+        color: #1e40af;
+    }
+
+    .artifact-box p {
+        margin-bottom: 0.5rem;
+    }
+
+    /* =========================
+       FOOTER
+    ========================== */
+
+    footer {
+        margin-top: 4rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--border);
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    /* =========================
+       RESPONSIVE
+    ========================== */
+
+    @media (max-width: 1024px) {
+        aside {
+            display: none;
+        }
+
+        main {
+            margin-left: 0;
+            max-width: 900px;
+            margin-right: auto;
+            margin-left: auto;
+            padding: 3rem 2rem 5rem;
+        }
+    }
+
+    @media (max-width: 700px) {
+        main {
+            padding: 2rem 1.1rem 4rem;
+        }
+
+        h1 {
+            font-size: 1.9rem;
+        }
+
+        p {
+            font-size: 0.96rem;
+        }
+
+        .metric-grid {
+            grid-template-columns: 1fr;
+        }
+
+        table {
+            font-size: 0.82rem;
+        }
+    }
+
+    @media print {
+        aside {
+            display: none;
+        }
+
+        main {
+            margin: 0;
+            max-width: none;
+            padding: 0;
+        }
+
+        body {
+            background: white;
+        }
+
+        .abstract-card,
+        .metric-card,
+        .img-card,
+        .table-container {
+            box-shadow: none;
+        }
+    }
+</style>
+```
+
+</head>
+
+<body>
+
+```
+<!-- =========================
+     SIDEBAR NAVIGATION
+========================== -->
+
+<aside>
+
+    <div class="author-box">
+        <h2>Muhammad Ali</h2>
+        <p>ML Capstone Project</p>
+    </div>
+
+    <div>
+        <h3>Contents</h3>
+
+        <ul>
+            <li><a href="#abstract">Abstract</a></li>
+            <li><a href="#introduction">1. Introduction</a></li>
+            <li><a href="#data">2. Data</a></li>
+            <li><a href="#methodology">3. Methodology</a></li>
+            <li><a href="#results">4. Results</a></li>
+            <li><a href="#limitations">5. Limitations</a></li>
+            <li><a href="#recommendations">6. Recommendations</a></li>
+            <li><a href="#reproducibility">7. Reproducibility</a></li>
+            <li><a href="#acknowledgments">8. Acknowledgments</a></li>
+            <li><a href="#communication">9. Communication Artifacts</a></li>
+        </ul>
+    </div>
+
+</aside>
+
+
+<!-- =========================
+     MAIN PAPER
+========================== -->
+
+<main>
+
+    <!-- HEADER -->
+
+    <header>
+
+        <span class="eyebrow">Machine Learning Capstone Research</span>
+
+        <h1>
+            Prioritizing Search Content for Human Review:
+            A Time-Aware Opportunity Scoring Study
+        </h1>
+
+        <p class="subtitle">
+            An observational machine-learning study comparing a transparent
+            rule-based baseline with Logistic Regression for prioritizing
+            search-content opportunities for human review.
+        </p>
+
+        <div class="meta-byline">
+            Author: <strong>Muhammad Ali</strong>
+            &nbsp; | &nbsp;
+            Capstone Portfolio
+        </div>
+
+    </header>
+
+
+    <!-- ABSTRACT -->
+
+    <section id="abstract">
+
+        <div class="abstract-card">
+
+            <h2>Abstract</h2>
+
+            <p>
+                This study asks whether current search-performance signals
+                can prioritize content items for human review when a
+                low-CTR / strong-position condition is observed in the
+                following seven days. It uses the pseudonymized FlyRank
+                warehouse release and compares a rule-based baseline with
+                Logistic Regression using a chronological split with a
+                seven-day embargo.
+            </p>
+
+            <p>
+                The test set contains <strong>227,495 eligible observations</strong>,
+                and its observed positive-label rate is <strong>0.7087</strong>.
+                On this chronological holdout, Logistic Regression had the
+                higher F1 score than the rule-based baseline. This is a
+                measured result for this split only.
+            </p>
+
+            <p>
+                The resulting scores are intended for review prioritization
+                only and do not estimate the causal impact of refreshing
+                content.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- 1. INTRODUCTION -->
+
+    <section id="introduction">
+
+        <h2>1. Introduction / Problem Statement</h2>
+
+        <p>
+            Content teams need a repeatable way to decide which items to
+            inspect first. This study evaluates a simple, auditable
+            decision-support workflow.
+        </p>
+
+        <p>
+            It does not attempt to prove a Google ranking factor or claim
+            that any refresh will cause better performance.
+        </p>
+
+    </section>
+
+
+    <!-- 2. DATA -->
+
+    <section id="data">
+
+        <h2>2. Data</h2>
+
+        <p>
+            The analysis uses
+            <code>FlyRank/internship-warehouse</code>,
+            release <code>v20260703</code>, specifically
+            <code>fact_content_daily_performance</code>.
+        </p>
+
+        <p>
+            The decision observations cover
+            <strong>2026-03-01 through 2026-03-31</strong>.
+            The forward-label source window extends through
+            <strong>2026-04-07</strong>.
+        </p>
+
+        <p>
+            Rows must have GSC availability, at least
+            <strong>100 impressions</strong> at decision time, and at least
+            <strong>four observed days</strong> in the next seven-day window.
+        </p>
+
+        <div class="warning-box">
+
+            <h4>Privacy and Data Protection</h4>
+
+            <p>
+                Client names, domains, URLs, private queries, credentials,
+                raw exports, and identifiers are not included in this
+                public paper.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- 3. METHODOLOGY -->
+
+    <section id="methodology">
+
+        <h2>3. Methodology</h2>
+
+        <h3>Features</h3>
+
+        <p>
+            Features are log-transformed current impressions and clicks,
+            current CTR, and current average position.
+        </p>
+
+        <h3>Future Outcome Definition</h3>
+
+        <p>
+            The target is <strong>1</strong> when at least one sufficiently
+            observed day in the next seven calendar days has:
+        </p>
+
+        <ul class="content-list">
+
+            <li>At least 100 impressions</li>
+
+            <li>Average position ≤ 10</li>
+
+            <li>CTR &lt; 2%</li>
+
+        </ul>
+
+        <p>
+            The target is <strong>0</strong> when at least four future
+            observed days exist and none meets the condition.
+            Incomplete follow-up is excluded.
+        </p>
+
+
+        <h3>Rule-Based Baseline</h3>
+
+        <p>
+            The baseline flags a current item with at least 100 impressions,
+            average position ≤ 10, and CTR &lt; 2%.
+        </p>
+
+
+        <h3>Logistic Regression</h3>
+
+        <p>
+            Logistic Regression uses median imputation, standardization,
+            and balanced class weights.
+        </p>
+
+
+        <h3>Time-Aware Evaluation</h3>
+
+        <p>
+            Training covers <strong>March 1–14</strong>.
+            March 15–21 is used as a <strong>seven-day embargo</strong>.
+            Testing covers <strong>March 22–31</strong>.
+        </p>
+
+        <div class="info-box">
+
+            <h4>Leakage Control</h4>
+
+            <p>
+                Future-window, label-derived, and identifier fields are
+                excluded from model features. The chronological split and
+                embargo are designed to prevent future information from
+                entering the training features.
+            </p>
+
+        </div>
+
+
+        <h3>Ranking Tie-Breaking</h3>
+
+        <p>
+            The rule-based baseline produces binary scores, resulting in
+            tied rankings. Ties were broken using current impressions so
+            that items could be placed in a deterministic order.
+        </p>
+
+        <p>
+            Consequently, the reported ranking metrics depend partly on
+            this tie-break rule and should be interpreted with that
+            limitation in mind.
+        </p>
+
+    </section>
+
+
+    <!-- 4. RESULTS -->
+
+    <section id="results">
+
+        <h2>4. Results</h2>
+
+        <p>
+            On this chronological holdout, Logistic Regression had the
+            higher F1 score than the rule-based baseline. This is a
+            measured result for this split only.
+        </p>
+
+
+        <div class="metric-grid">
+
+            <div class="metric-card">
+                <div class="metric-label">
+                    Test observations
+                </div>
+                <div class="metric-value">
+                    227,495
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">
+                    Baseline F1
+                </div>
+                <div class="metric-value">
+                    0.9374
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">
+                    Logistic Regression F1
+                </div>
+                <div class="metric-value">
+                    0.9472
+                </div>
+            </div>
+
+        </div>
+
+
+        <h3>Classification Metrics</h3>
+
+        <p>
+            Both methods are evaluated on the same held-out observations.
+        </p>
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Method</th>
+                        <th>Accuracy</th>
+                        <th>Precision</th>
+                        <th>Recall</th>
+                        <th>F1</th>
+                        <th>ROC-AUC</th>
+                        <th>Average Precision</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td>Rule-based baseline</td>
+                        <td>0.9128</td>
+                        <td>0.9543</td>
+                        <td>0.9210</td>
+                        <td><strong>0.9374</strong></td>
+                        <td>0.9069</td>
+                        <td>0.9349</td>
+                    </tr>
+
+                    <tr>
+                        <td>Logistic Regression</td>
+                        <td>0.9248</td>
+                        <td>0.9425</td>
+                        <td>0.9519</td>
+                        <td><strong>0.9472</strong></td>
+                        <td>0.9535</td>
+                        <td>0.9727</td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <h3>Ranking Metrics</h3>
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Method</th>
+                        <th>K</th>
+                        <th>Precision@K</th>
+                        <th>Recall@K</th>
+                        <th>Positive Cases Found</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td>Rule-based baseline</td>
+                        <td>20</td>
+                        <td>1.0000</td>
+                        <td>0.0001</td>
+                        <td>20</td>
+                    </tr>
+
+                    <tr>
+                        <td>Rule-based baseline</td>
+                        <td>100</td>
+                        <td>0.9900</td>
+                        <td>0.0006</td>
+                        <td>99</td>
+                    </tr>
+
+                    <tr>
+                        <td>Rule-based baseline</td>
+                        <td>500</td>
+                        <td>0.9940</td>
+                        <td>0.0031</td>
+                        <td>497</td>
+                    </tr>
+
+                    <tr>
+                        <td>Logistic Regression</td>
+                        <td>20</td>
+                        <td>1.0000</td>
+                        <td>0.0001</td>
+                        <td>20</td>
+                    </tr>
+
+                    <tr>
+                        <td>Logistic Regression</td>
+                        <td>100</td>
+                        <td>0.9900</td>
+                        <td>0.0006</td>
+                        <td>99</td>
+                    </tr>
+
+                    <tr>
+                        <td>Logistic Regression</td>
+                        <td>500</td>
+                        <td>0.9860</td>
+                        <td>0.0031</td>
+                        <td>493</td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <h3>Interpretation</h3>
+
+        <p>
+            Logistic Regression achieved an F1 score of
+            <strong>0.9472</strong>, compared with
+            <strong>0.9374</strong> for the rule-based baseline, on the
+            same chronological test set.
+        </p>
+
+        <p>
+            Its recall was higher
+            (<strong>0.9519</strong> versus <strong>0.9210</strong>),
+            while its precision was slightly lower
+            (<strong>0.9425</strong> versus <strong>0.9543</strong>).
+            This represents a trade-off between identifying more positive
+            cases and generating more false-positive predictions.
+        </p>
+
+        <p>
+            Although the model achieved a better F1 score in this
+            evaluation, the ranking metrics were similar. Therefore, the
+            results do not establish a substantial improvement in practical
+            prioritization over the rule-based approach.
+        </p>
+
+
+        <h3>Figures</h3>
+
+        <div class="image-grid">
+
+            <figure class="img-card">
+
+                <img
+                    src="assets/model_vs_baseline.png"
+                    alt="Comparison of Logistic Regression and rule-based baseline performance"
+                >
+
+                <figcaption>
+                    Figure 1 — Model versus baseline comparison
+                </figcaption>
+
+            </figure>
+
+
+            <figure class="img-card">
+
+                <img
+                    src="assets/confusion_matrix.png"
+                    alt="Confusion matrix for the classification model"
+                >
+
+                <figcaption>
+                    Figure 2 — Confusion matrix
+                </figcaption>
+
+            </figure>
+
+
+            <figure class="img-card">
+
+                <img
+                    src="assets/feature_coefficients.png"
+                    alt="Logistic Regression feature coefficients"
+                >
+
+                <figcaption>
+                    Figure 3 — Logistic Regression feature coefficients
+                </figcaption>
+
+            </figure>
+
+        </div>
+
+    </section>
+
+
+    <!-- 5. LIMITATIONS -->
+
+    <section id="limitations">
+
+        <h2>5. Limitations &amp; Honest Framing</h2>
+
+        <ul class="content-list">
+
+            <li>
+                This is a single March decision-window evaluation, not a
+                seasonal study.
+            </li>
+
+            <li>
+                The target is a defined future performance condition, not
+                a verified need for refresh or evidence of refresh success.
+            </li>
+
+            <li>
+                The analysis is observational and cannot establish
+                causality.
+            </li>
+
+            <li>
+                Observation coverage varies.
+            </li>
+
+            <li>
+                CTR depends on factors not fully represented in the data.
+            </li>
+
+            <li>
+                A chronological split does not prove generalization to
+                unseen clients.
+            </li>
+
+            <li>
+                Logistic Regression scores are used for ranking and are
+                not presented as calibrated probabilities.
+            </li>
+
+        </ul>
+
+        <div class="warning-box">
+
+            <h4>Important Interpretation</h4>
+
+            <p>
+                A higher model score should not be interpreted as a
+                guarantee that editing or refreshing a page will improve
+                its search performance.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- 6. RECOMMENDATIONS -->
+
+    <section id="recommendations">
+
+        <h2>6. Ranked Recommendations</h2>
+
+        <p>
+            Use the ranked queue as a human-review aid rather than an
+            automatic content-editing system.
+        </p>
+
+        <p>
+            In this evaluation, all 100 items in the top-ranked action
+            summary were assigned the same review action:
+            <strong>checking title/snippet accuracy and query intent</strong>.
+        </p>
+
+        <p>
+            This indicates that the recommendations were concentrated in
+            one action category; the results do not demonstrate a diverse
+            set of opportunities beyond the transparent rule-based
+            approach.
+        </p>
+
+
+        <h3>Recommended Human Review Process</h3>
+
+        <ol class="content-list">
+
+            <li>
+                Review query intent.
+            </li>
+
+            <li>
+                Examine competing search results.
+            </li>
+
+            <li>
+                Assess content usefulness and completeness.
+            </li>
+
+            <li>
+                Check freshness where relevant.
+            </li>
+
+            <li>
+                Review internal linking opportunities.
+            </li>
+
+            <li>
+                Treat the model score as a prioritization signal rather
+                than a guarantee.
+            </li>
+
+            <li>
+                Monitor subsequent search performance after changes.
+            </li>
+
+        </ol>
+
+
+        <h3>Aggregate Action Summary from the Top-Ranked 100 Test Observations</h3>
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Suggested Review Action</th>
+                        <th>Reason Code</th>
+                        <th>Items</th>
+                        <th>Median Impressions</th>
+                        <th>Median CTR (%)</th>
+                        <th>Median Average Position</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td>
+                            Review title/snippet and query intent
+                        </td>
+
+                        <td>
+                            <code>CURRENT_LOW_CTR_STRONG_POSITION</code>
+                        </td>
+
+                        <td>100</td>
+                        <td>9669.5000</td>
+                        <td>0.0514</td>
+                        <td>2.3157</td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- 7. REPRODUCIBILITY -->
+
+    <section id="reproducibility">
+
+        <h2>7. Reproducibility</h2>
+
+        <p>
+            The notebook reads the gated dataset through DuckDB and
+            Hugging Face using a read-only token stored in Colab Secrets.
+        </p>
+
+        <p>
+            It writes the model metrics, ranking metrics, action summary,
+```
