@@ -1,0 +1,93 @@
+{
+  "dataset_release": "FlyRank/internship-warehouse v20260703",
+  "source_table": "fact_content_daily_performance",
+  "decision_window": "2026-03-01 through 2026-03-31",
+  "future_label_window": "next 7 calendar days; source observations through 2026-04-07",
+  "minimum_current_impressions": 100,
+  "minimum_future_observed_days": 4,
+  "training_window": "2026-03-01 through 2026-03-14",
+  "embargo_window": "2026-03-15 through 2026-03-21",
+  "test_window": "2026-03-22 through 2026-03-31",
+  "eligible_rows": 638335,
+  "training_rows": 272524,
+  "test_rows": 227495,
+  "test_positive_rate": 0.7086705202312139,
+  "features": [
+    "log_impressions",
+    "log_clicks",
+    "ctr",
+    "avg_position"
+  ],
+  "target": "future_low_ctr_strong_position",
+  "metrics": [
+    {
+      "method": "Rule-based baseline",
+      "accuracy": 0.9127892920723533,
+      "precision": 0.9543114584471423,
+      "recall": 0.9210328807398631,
+      "f1": 0.9373769001565577,
+      "roc_auc": 0.906884658125982,
+      "average_precision": 0.9349139011838732
+    },
+    {
+      "method": "Logistic Regression",
+      "accuracy": 0.9247895558144135,
+      "precision": 0.9425326888707369,
+      "recall": 0.9519101346615474,
+      "f1": 0.9471982027021189,
+      "roc_auc": 0.9535478980832603,
+      "average_precision": 0.9727115111561455
+    }
+  ],
+  "ranking_metrics": [
+    {
+      "method": "Rule-based baseline",
+      "k_requested": 20,
+      "k_evaluated": 20,
+      "precision_at_k": 1.0,
+      "recall_at_k": 0.00012405485705779096,
+      "positive_cases_found": 20
+    },
+    {
+      "method": "Rule-based baseline",
+      "k_requested": 100,
+      "k_evaluated": 100,
+      "precision_at_k": 0.99,
+      "recall_at_k": 0.0006140715424360652,
+      "positive_cases_found": 99
+    },
+    {
+      "method": "Rule-based baseline",
+      "k_requested": 500,
+      "k_evaluated": 500,
+      "precision_at_k": 0.994,
+      "recall_at_k": 0.003082763197886105,
+      "positive_cases_found": 497
+    },
+    {
+      "method": "Logistic Regression",
+      "k_requested": 20,
+      "k_evaluated": 20,
+      "precision_at_k": 1.0,
+      "recall_at_k": 0.00012405485705779096,
+      "positive_cases_found": 20
+    },
+    {
+      "method": "Logistic Regression",
+      "k_requested": 100,
+      "k_evaluated": 100,
+      "precision_at_k": 0.99,
+      "recall_at_k": 0.0006140715424360652,
+      "positive_cases_found": 99
+    },
+    {
+      "method": "Logistic Regression",
+      "k_requested": 500,
+      "k_evaluated": 500,
+      "precision_at_k": 0.986,
+      "recall_at_k": 0.003057952226474547,
+      "positive_cases_found": 493
+    }
+  ],
+  "privacy_note": "Public metrics and charts contain aggregate results only; local queue with pseudonymous IDs is not for publication."
+}
